@@ -229,6 +229,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return false
     }
     
+    // Delete a cell from display
     private func deleteFromDisplay(at indexPath: IndexPath) {
         // update the cell background
         var cell: ListTableViewCell
