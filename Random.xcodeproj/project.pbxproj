@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EC3E325321925515001C9A52 /* ListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC3E325221925515001C9A52 /* ListTableViewCell.swift */; };
+		EC3E325521928E9E001C9A52 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC3E325421928E9E001C9A52 /* DataModel.swift */; };
+		EC48CE7021858D2500E3F52A /* AnswerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC48CE6F21858D2500E3F52A /* AnswerViewController.swift */; };
 		ECAA2989214628B5000DD696 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA2988214628B5000DD696 /* AppDelegate.swift */; };
 		ECAA298B214628B5000DD696 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA298A214628B5000DD696 /* FirstViewController.swift */; };
 		ECAA298D214628B5000DD696 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA298C214628B5000DD696 /* SecondViewController.swift */; };
@@ -35,6 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EC3E325221925515001C9A52 /* ListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTableViewCell.swift; sourceTree = "<group>"; };
+		EC3E325421928E9E001C9A52 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		EC48CE6F21858D2500E3F52A /* AnswerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerViewController.swift; sourceTree = "<group>"; };
 		ECAA2985214628B5000DD696 /* Random.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Random.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECAA2988214628B5000DD696 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ECAA298A214628B5000DD696 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -106,6 +112,9 @@
 				ECAA2991214628B8000DD696 /* Assets.xcassets */,
 				ECAA2993214628B8000DD696 /* LaunchScreen.storyboard */,
 				ECAA2996214628B8000DD696 /* Info.plist */,
+				EC48CE6F21858D2500E3F52A /* AnswerViewController.swift */,
+				EC3E325221925515001C9A52 /* ListTableViewCell.swift */,
+				EC3E325421928E9E001C9A52 /* DataModel.swift */,
 			);
 			path = Random;
 			sourceTree = "<group>";
@@ -259,9 +268,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC48CE7021858D2500E3F52A /* AnswerViewController.swift in Sources */,
 				ECAA298D214628B5000DD696 /* SecondViewController.swift in Sources */,
 				ECAA2989214628B5000DD696 /* AppDelegate.swift in Sources */,
 				ECAA298B214628B5000DD696 /* FirstViewController.swift in Sources */,
+				EC3E325321925515001C9A52 /* ListTableViewCell.swift in Sources */,
+				EC3E325521928E9E001C9A52 /* DataModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
