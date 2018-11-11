@@ -14,6 +14,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var saveBtn: UIButton!
     
+    // The name of the list to display
+    private var listName = ""
     // The list of items to display
     private var displayList: Array<String> = []
     // Control for pull to refresh
@@ -45,6 +47,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         // set up buttons
         reverseSaveBtn(withAlpha: 0.5)
+        
+        // display list name
+        tableTitle.text = listName
         
         // display table view
         addPlaceHolderCellWithRefresh()
@@ -83,6 +88,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBAction func unwindToFirst(segue: UIStoryboardSegue) {
     }
     
+    // For "Add" button
     @IBAction func addNewItem(_ sender: UIButton) {
         prevCount = displayList.count
         let cell : ListTableViewCell = addPlaceHolderCellWithoutRefresh()
@@ -90,12 +96,14 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         cell.label.becomeFirstResponder()
     }
     
+    // For "Generate" button
     @IBAction func generateResult(_ sender: UIButton) {
         if !displayNoItemWarning() {
             performSegue(withIdentifier: "toAnswer", sender: sender)
         }
     }
     
+    // For "Save" button
     @IBAction func saveChanges(_ sender: UIButton) {
         // save changes to data model
         DataModel.sharedInstance.updateData(to: displayList)
@@ -180,16 +188,17 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return true
     }
     
-    // Private Functions
+    /* Private Functions */
     
     // Get new data
     @objc private func getDataUpdate() {
         if let data = DataModel.sharedInstance.data {
-            displayList = data
+            listName = data[0]
+            displayList = Array(data.dropFirst())
         }
     }
     
-    // Refresh table entries
+    // Refresh table entries (for pull to refresh)
     @objc private func refreshData(sender: UIRefreshControl) {
         addPlaceHolderCellWithRefresh()
         tableView.reloadData()
@@ -217,6 +226,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return cell
     }
     
+    // Display an alert when "Generate" button is pressed but there is no item
     private func displayNoItemWarning() -> Bool {
         if displayList.isEmpty || (displayList.count == 1 && displayList[0] == "") {
             // display a warning rather than generate result

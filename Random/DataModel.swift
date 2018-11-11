@@ -25,6 +25,6 @@ class DataModel {
     
     public func requestData() {
         // TODO: fetch data from local file
-        self.data = ["川宗", "富临轩", "西安味道", "唐朝", "center table", "uk"]
+        self.data = ["Ave", "川宗", "富临轩", "西安味道", "唐朝", "center table", "uk"]
     }
 }

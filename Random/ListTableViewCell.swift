@@ -16,16 +16,14 @@ class ListTableViewCell: UITableViewCell {
     private let leftMarginForLabel: CGFloat = 15.0
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        label.textColor = UIColor.black
-        label.contentVerticalAlignment = UIControlContentVerticalAlignment.center
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setUpTextField()
         addSubview(label)
     }
     
     required init(coder aDecoder: NSCoder) {
-        label.textColor = UIColor.black
-        label.contentVerticalAlignment = UIControlContentVerticalAlignment.center
         super.init(coder: aDecoder)!
+        setUpTextField()
         addSubview(label)
     }
     
@@ -42,6 +40,13 @@ class ListTableViewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         label.frame = CGRect(x: leftMarginForLabel, y: 0, width: bounds.size.width - leftMarginForLabel, height: bounds.size.height)
+    }
+    
+    // Set up the textfield in label
+    private func setUpTextField() {
+        label.textColor = UIColor.black
+        label.clearButtonMode = .whileEditing
+        label.contentVerticalAlignment = UIControlContentVerticalAlignment.center
     }
 
 }
