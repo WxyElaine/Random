@@ -17,9 +17,11 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     @IBOutlet weak var saveBtn: UIButton!
     @IBOutlet weak var popUpLabel: UILabel!
     
+    // The index of selected list
+    private var selectedListIndex = -1
     // The list of lists of itmes to display
     // (the first item in every sublist is the name of that list)
-    private var displayList: Array<Array<String>> = [["A", "a", "b", "c"], ["B", "b", "c", "d"], ["C", "c", "d", "e"]]
+    private var displayList: Array<Array<String>> = []
     // Control for pull to refresh
     private let refreshControl = UIRefreshControl()
     // Name of the new added list
@@ -40,9 +42,16 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     // #e2e0ff
     // UIColor(red:0.89, green:0.88, blue:1.00, alpha:1.0)
     private var colors: Array<UIColor> = [UIColor(red:0.89, green:0.95, blue:1.00, alpha:1.0), UIColor(red:0.89, green:0.92, blue:1.00, alpha:1.0), UIColor(red:0.89, green:0.88, blue:1.00, alpha:1.0)]
+    // Selected Cell Color
+    private var selectedCellColor = UIColor(red:1.00, green:1.00, blue:0.61, alpha:1.0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // set up the observer to listen to data update
+        NotificationCenter.default.addObserver(self, selector: #selector(getDataUpdate), name: NSNotification.Name(rawValue: "update"), object: nil)
+        // get new data
+        DataModel.sharedInstance.requestData()
         
         // set up textfield
         self.textField.delegate = self
@@ -68,6 +77,12 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // remove the observer
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "update"), object: self)
     }
 
     // For "Add" button
@@ -146,10 +161,23 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // TODO: go to main view to display contents of the list
         
+        // get the selected cell
+        var cell: UITableViewCell
+        if let celltry = self.tableView.dequeueReusableCell(withIdentifier: "listcell") {
+            cell = celltry
+        } else {
+            cell = UITableViewCell.init(style: UITableViewCellStyle.subtitle, reuseIdentifier: "listcell")
+        }
+        // deselect the previous cell
+        let prevcell = tableView.cellForRow(at: [0, self.selectedListIndex])
+        prevcell!.backgroundColor = self.colors[indexPath.row % 3]
+        displayList[selectedListIndex][0] = "0"
+        
         // mark this list as selected
+        self.selectedListIndex = indexPath.row
+        cell.backgroundColor = selectedCellColor
+        displayList[selectedListIndex][0] = "1"
         
-        
-        self.tableView.deselectRow(at: indexPath, animated: true)
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -160,14 +188,23 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
             cell = UITableViewCell.init(style: UITableViewCellStyle.subtitle, reuseIdentifier: "listcell")
         }
         
-        // configure the cell
+        // configure the cell text
         cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.detailTextLabel?.adjustsFontSizeToFitWidth = true
-        cell.backgroundColor = self.colors[indexPath.row % 3]
         let sublist = self.displayList[indexPath.row]
-        cell.textLabel?.text = sublist[0]
+        cell.textLabel?.text = sublist[1]
         cell.detailTextLabel?.text = sublistToString(sublist)
-        
+        // configure the cell select style
+        cell.selectionStyle = .none
+        // update self.selectedListIndex, and cell background
+        if (sublist[0] == "1") {
+            self.selectedListIndex = indexPath.row
+            // mark this list(cell) as selected
+            cell.backgroundColor = selectedCellColor
+        } else {
+            cell.backgroundColor = self.colors[indexPath.row % 3]
+        }
+
         return cell
     }
     
@@ -184,6 +221,13 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     /* Private Functions */
+    
+    // Get new data
+    @objc private func getDataUpdate() {
+        if let data = DataModel.sharedInstance.data {
+            displayList = data
+        }
+    }
     
     // Refresh table entries (for pull to refresh)
     @objc private func refreshData(sender: UIRefreshControl) {
@@ -208,7 +252,7 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     // Return the string representation of sublist of the given list (item from index 1 to end)
     private func sublistToString(_ list: Array<String>) -> String {
         var s: String = ""
-        let sublist = list.dropFirst()
+        let sublist = list.dropFirst().dropFirst()
         for item in sublist {
             s += "\(item), "
         }

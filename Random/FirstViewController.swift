@@ -193,8 +193,14 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     // Get new data
     @objc private func getDataUpdate() {
         if let data = DataModel.sharedInstance.data {
-            listName = data[0]
-            displayList = Array(data.dropFirst())
+            for sublist in data {
+                if (sublist[0] == "1") {
+                    // the current list is selected, display this list
+                    listName = sublist[1]
+                    displayList = Array(sublist.dropFirst().dropFirst())
+                    break
+                }
+            }
         }
     }
     
