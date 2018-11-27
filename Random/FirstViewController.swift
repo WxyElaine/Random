@@ -26,6 +26,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     private var deleteIndex = -1
     // Number of items in displayList before add button is pushed
     private var prevCount = 0
+    // Boolean specifying whether the current list is a valid list in the user's data
+    // (i.e. the current list cannot be a placeholder list)
+    private var invalidList = false
     
     // Color Palette
     // #d0fcff, #d0ecff, #d0dcff, #d0ccff, #d0bcff
@@ -45,8 +48,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         // get new data
         DataModel.sharedInstance.requestData()
         
-        // set up buttons
-        reverseSaveBtn(withAlpha: 0.5)
+        // set up buttons (disable save button)
+        reverseSaveBtn(isEnabled: false, withAlpha: 0.5)
         
         // display list name
         tableTitle.text = listName
@@ -64,11 +67,23 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             tableView.addSubview(refreshControl)
         }
         refreshControl.addTarget(self, action: #selector(FirstViewController.refreshData(sender:)), for: .valueChanged)
+        
+        // TODO: disable user interaction if the current list is invalid
+        if invalidList {
+            
+        }
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        // reload display when user switches to this tab
+        tableTitle.text = listName
+        addPlaceHolderCellWithRefresh()
+        tableView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -89,7 +104,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     // For "Add" button
-    @IBAction func addNewItem(_ sender: UIButton) {
+    @IBAction func addNewItem(_ sender: UIButton?) {
         prevCount = displayList.count
         let cell : ListTableViewCell = addPlaceHolderCellWithoutRefresh()
         // display keyboard
@@ -107,7 +122,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBAction func saveChanges(_ sender: UIButton) {
         // save changes to data model
         DataModel.sharedInstance.updateData(to: displayList)
-        reverseSaveBtn(withAlpha: 0.5)
+        // disable save button
+        reverseSaveBtn(isEnabled: false, withAlpha: 0.5)
     }
     
     // Tableview
@@ -131,7 +147,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             // delete the row from display(screen)
             deleteFromDisplay(at: indexPath)
             // enable save button
-            reverseSaveBtn(withAlpha: 1.0)
+            reverseSaveBtn(isEnabled: true, withAlpha: 1.0)
         }
     }
 
@@ -168,7 +184,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         // enable save button if changes are detected
         if prevCount != displayList.count {
-            reverseSaveBtn(withAlpha: 1.0)
+            reverseSaveBtn(isEnabled: true, withAlpha: 1.0)
         }
         return false
     }
@@ -193,14 +209,22 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     // Get new data
     @objc private func getDataUpdate() {
         if let data = DataModel.sharedInstance.data {
-            for sublist in data {
-                if (sublist[0] == "1") {
-                    // the current list is selected, display this list
-                    listName = sublist[1]
-                    displayList = Array(sublist.dropFirst().dropFirst())
-                    break
+            if data.isEmpty {
+                invalidList = true
+                listName = "???"
+                displayList.append("")
+            } else {
+                invalidList = false
+                for sublist in data {
+                    if (sublist[0] == "1") {
+                        // the current list is selected, display this list
+                        listName = sublist[1]
+                        displayList = Array(sublist.dropFirst().dropFirst())
+                        break
+                    }
                 }
             }
+            
         }
     }
     
@@ -264,11 +288,11 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     // Enable or disable the save button and set its alpha to the given value
-    private func reverseSaveBtn(withAlpha alpha: Float) {
-        saveBtn.isEnabled = !saveBtn.isEnabled
+    private func reverseSaveBtn(isEnabled status: Bool, withAlpha alpha: Float) {
+        saveBtn.isEnabled = status
         saveBtn.alpha = CGFloat(alpha)
         var color = UIColor.black
-        if (alpha == 0.5) {
+        if (!status) {
             color = UIColor(red:0.65, green:0.65, blue:0.65, alpha:1.0)
         }
         saveBtn.setTitleColor(color, for: [])

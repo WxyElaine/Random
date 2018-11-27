@@ -79,6 +79,11 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        // reload table when user switches to this tab
+        tableView.reloadData()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         // remove the observer
@@ -99,26 +104,28 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     // For "Save" button in popup
     @IBAction func saveChanges(_ sender: UIButton) {
-        // save changes to data model
-//        DataModel.sharedInstance.updateData(to: displayList)
-        
         // change display
         reverseSaveBtn(withAlpha: 0.5)
         if isAdding {
             // add a new entry to displayList
-            displayList.append([newListName])
+            let newSublist = ["0", newListName]
+            displayList.append(newSublist)
             let indexPath: IndexPath = [0, displayList.count - 1]
             tableView.insertRows(at: [indexPath], with: .fade)
             let cell : UITableViewCell = tableView.cellForRow(at: indexPath)!
             cell.textLabel?.text = newListName
-            // TODO: jump to main view
             
+            // save changes to data model
+            DataModel.sharedInstance.addData(add: newSublist)
             
         } else if isNew(newListName) {
             // update displayList
-            displayList[selectedIndex][0] = newListName
+            displayList[selectedIndex][1] = newListName
             let cell : UITableViewCell = tableView.cellForRow(at: [0, selectedIndex])!
             cell.textLabel?.text = newListName
+            
+            // save changes to data model
+            DataModel.sharedInstance.updateHeader(prev: selectedIndex, new: -1, toName: newListName)
         }
         backToListView()
     }
@@ -147,11 +154,24 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
         edit.backgroundColor = .lightGray
         
         let delete = UITableViewRowAction(style: .normal, title: "Delete") { action, index in
-            // TODO: delete the row from local file perminantly
-            //
+            // display a warning for deletion
+            let deleteAlert = UIAlertController(title: "Caution", message: "Do you really want to delete this list?", preferredStyle: UIAlertControllerStyle.alert)
             
-            // delete the row from display(screen)
-            self.deleteFromDisplay(at: editActionsForRowAt)
+            // action for real delete
+            let deleteAction = UIAlertAction(title: "Yes", style: .default, handler: {
+                (action: UIAlertAction!) in
+                // TODO: delete the row from local file perminantly
+                //
+                
+                // delete the row from display(screen)
+                self.deleteFromDisplay(at: editActionsForRowAt)
+                })
+            // add and present alert
+            deleteAlert.addAction(deleteAction)
+            deleteAlert.addAction(UIAlertAction(title: "No", style: .default, handler: { (action: UIAlertAction!) in
+            }))
+            self.present(deleteAlert, animated: true, completion: nil)
+            
         }
         delete.backgroundColor = .blue
         
@@ -159,25 +179,24 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // TODO: go to main view to display contents of the list
-        
-        // get the selected cell
-        var cell: UITableViewCell
-        if let celltry = self.tableView.dequeueReusableCell(withIdentifier: "listcell") {
-            cell = celltry
-        } else {
-            cell = UITableViewCell.init(style: UITableViewCellStyle.subtitle, reuseIdentifier: "listcell")
-        }
         // deselect the previous cell
         let prevcell = tableView.cellForRow(at: [0, self.selectedListIndex])
-        prevcell!.backgroundColor = self.colors[indexPath.row % 3]
+        prevcell!.backgroundColor = self.colors[self.selectedListIndex % 3]
         displayList[selectedListIndex][0] = "0"
+        let prevIndex = selectedListIndex
         
         // mark this list as selected
         self.selectedListIndex = indexPath.row
-        cell.backgroundColor = selectedCellColor
         displayList[selectedListIndex][0] = "1"
+        // get the selected cell
+        let cell = tableView.cellForRow(at: indexPath)
+        cell!.backgroundColor = selectedCellColor
         
+        // save changes to data model
+        DataModel.sharedInstance.updateHeader(prev: prevIndex, new: selectedListIndex, toName: nil)
+        
+        // TODO: go to main view to display contents of the list
+
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

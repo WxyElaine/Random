@@ -18,6 +18,7 @@
 		ECAA2995214628B8000DD696 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAA2993214628B8000DD696 /* LaunchScreen.storyboard */; };
 		ECAA29A0214628B8000DD696 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA299F214628B8000DD696 /* RandomTests.swift */; };
 		ECAA29AB214628B8000DD696 /* RandomUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAA29AA214628B8000DD696 /* RandomUITests.swift */; };
+		ECFD11BE21AD4C6C003DA508 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFD11BD21AD4C6C003DA508 /* TabBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		ECAA29A6214628B8000DD696 /* RandomUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RandomUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECAA29AA214628B8000DD696 /* RandomUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomUITests.swift; sourceTree = "<group>"; };
 		ECAA29AC214628B8000DD696 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ECFD11BD21AD4C6C003DA508 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 				EC48CE6F21858D2500E3F52A /* AnswerViewController.swift */,
 				EC3E325221925515001C9A52 /* ListTableViewCell.swift */,
 				EC3E325421928E9E001C9A52 /* DataModel.swift */,
+				ECFD11BD21AD4C6C003DA508 /* TabBarController.swift */,
 			);
 			path = Random;
 			sourceTree = "<group>";
@@ -272,6 +275,7 @@
 				ECAA298D214628B5000DD696 /* SecondViewController.swift in Sources */,
 				ECAA2989214628B5000DD696 /* AppDelegate.swift in Sources */,
 				ECAA298B214628B5000DD696 /* FirstViewController.swift in Sources */,
+				ECFD11BE21AD4C6C003DA508 /* TabBarController.swift in Sources */,
 				EC3E325321925515001C9A52 /* ListTableViewCell.swift in Sources */,
 				EC3E325521928E9E001C9A52 /* DataModel.swift in Sources */,
 			);
