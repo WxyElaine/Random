@@ -41,19 +41,22 @@ class DataModel {
         // find the newData(the sublist) in data
         if (data != nil) {
             let index = data!.firstIndex(where: { $0[0] == "1" })
-            var newSublist: Array<String> = []
-            newSublist.append(data![index!][0])
-            newSublist.append(data![index!][1])
-            for newEntry in newData {
-                newSublist.append(newEntry)
+            if index != nil {
+                var newSublist: Array<String> = []
+                newSublist.append(data![index!][0])
+                newSublist.append(data![index!][1])
+                for newEntry in newData {
+                    newSublist.append(newEntry)
+                }
+                data![index!] = newSublist
+                
+                // TODO: delete this
+                dataTemp = data!
+                
+                // TODO: save to local file
+
             }
-            data![index!] = newSublist
-            
-            // TODO: delete this
-            dataTemp = data!
         }
-        
-        // TODO: save to local file
     }
     
     // Update the list header
@@ -69,7 +72,9 @@ class DataModel {
         if (data != nil) {
             if (newName == nil) {
                 // change the selection indicator
-                data![prevIndex][0] = "0"
+                if (prevIndex > -1) {
+                    data![prevIndex][0] = "0"
+                }
                 data![newIndex][0] = "1"
             } else {
                 // change the name of sublist
@@ -78,9 +83,10 @@ class DataModel {
             
             // TODO: delete this
             dataTemp = data!
+            
+            // TODO: save to local file
+
         }
-        
-        // TODO: save to local file
     }
     
     // Add a new sublist
@@ -91,9 +97,23 @@ class DataModel {
             
             // TODO: delete this
             dataTemp = data!
+            
+            // TODO: save to local file
+
         }
-        
-        // TODO: save to local file
+    }
+    
+    // Delete a sublist
+    public func deleteData(deleteAt index: Int) {
+        if (data != nil) {
+            data?.remove(at: index)
+            
+            // TODO: delete this
+            dataTemp = data!
+            
+            // TODO: save to local file
+
+        }
     }
     
     public func requestData() {

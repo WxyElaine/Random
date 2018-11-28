@@ -28,17 +28,19 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     private var prevCount = 0
     // Boolean specifying whether the current list is a valid list in the user's data
     // (i.e. the current list cannot be a placeholder list)
-    private var invalidList = false
+    private var invalidList = true
     
     // Color Palette
-    // #d0fcff, #d0ecff, #d0dcff, #d0ccff, #d0bcff
     // #e2f3ff
     // UIColor(red:0.89, green:0.95, blue:1.00, alpha:1.0)
     // #e2eaff
     // UIColor(red:0.89, green:0.92, blue:1.00, alpha:1.0)
     // #e2e0ff
     // UIColor(red:0.89, green:0.88, blue:1.00, alpha:1.0)
-    private var colors: Array<UIColor> = [UIColor(red:0.89, green:0.95, blue:1.00, alpha:1.0), UIColor(red:0.89, green:0.92, blue:1.00, alpha:1.0), UIColor(red:0.89, green:0.88, blue:1.00, alpha:1.0)]
+    private var colors: Array<UIColor> = [
+        UIColor(red:0.89, green:0.95, blue:1.00, alpha:1.0),
+        UIColor(red:0.89, green:0.92, blue:1.00, alpha:1.0),
+        UIColor(red:0.89, green:0.88, blue:1.00, alpha:1.0)]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,9 +70,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         refreshControl.addTarget(self, action: #selector(FirstViewController.refreshData(sender:)), for: .valueChanged)
         
-        // TODO: disable user interaction if the current list is invalid
+        // disable user interaction if the current list is invalid
         if invalidList {
-            
+            disableUserInteraction()
         }
     }
     
@@ -84,6 +86,11 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableTitle.text = listName
         addPlaceHolderCellWithRefresh()
         tableView.reloadData()
+        if invalidList {
+            disableUserInteraction()
+        } else {
+            enableUserInteraction()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -208,23 +215,26 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     // Get new data
     @objc private func getDataUpdate() {
-        if let data = DataModel.sharedInstance.data {
-            if data.isEmpty {
-                invalidList = true
-                listName = "???"
-                displayList.append("")
-            } else {
-                invalidList = false
-                for sublist in data {
-                    if (sublist[0] == "1") {
-                        // the current list is selected, display this list
-                        listName = sublist[1]
-                        displayList = Array(sublist.dropFirst().dropFirst())
-                        break
-                    }
+        if let data = DataModel.sharedInstance.data {            
+            for sublist in data {
+                if (sublist[0] == "1") {
+                    // the current list is selected, display this list
+                    listName = sublist[1]
+                    displayList = Array(sublist.dropFirst().dropFirst())
+                    invalidList = false
+                    enableUserInteraction()
+                    break
                 }
             }
-            
+            // display placeholders if needed
+            if data.isEmpty {
+                invalidList = true
+            }
+            if invalidList {
+                listName = "Nothing Here"
+                displayList = []
+                disableUserInteraction()
+            }
         }
     }
     
@@ -296,5 +306,17 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             color = UIColor(red:0.65, green:0.65, blue:0.65, alpha:1.0)
         }
         saveBtn.setTitleColor(color, for: [])
+    }
+    
+    // Disable user interaction of the whole view
+    private func disableUserInteraction() {
+        view.isUserInteractionEnabled = false
+        view.alpha = CGFloat(0.5)
+    }
+    
+    // Enable user interaction of the whole view
+    private func enableUserInteraction() {
+        view.isUserInteractionEnabled = true
+        view.alpha = CGFloat(1.0)
     }
 }

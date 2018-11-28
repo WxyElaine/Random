@@ -17,7 +17,7 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     @IBOutlet weak var saveBtn: UIButton!
     @IBOutlet weak var popUpLabel: UILabel!
     
-    // The index of selected list
+    // The index of selected list (i.e. selected cell)
     private var selectedListIndex = -1
     // The list of lists of itmes to display
     // (the first item in every sublist is the name of that list)
@@ -30,8 +30,6 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     private var prevListName = ""
     // Boolean specifying if the user is adding or editing a list
     private var isAdding = false
-    // Index of the selected cell
-    private var selectedIndex = -1
     
     // Color Palette
     // #d0fcff, #d0ecff, #d0dcff, #d0ccff, #d0bcff
@@ -120,12 +118,12 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
             
         } else if isNew(newListName) {
             // update displayList
-            displayList[selectedIndex][1] = newListName
-            let cell : UITableViewCell = tableView.cellForRow(at: [0, selectedIndex])!
+            displayList[selectedListIndex][1] = newListName
+            let cell : UITableViewCell = tableView.cellForRow(at: [0, selectedListIndex])!
             cell.textLabel?.text = newListName
             
             // save changes to data model
-            DataModel.sharedInstance.updateHeader(prev: selectedIndex, new: -1, toName: newListName)
+            DataModel.sharedInstance.updateHeader(prev: selectedListIndex, new: -1, toName: newListName)
         }
         backToListView()
     }
@@ -146,7 +144,7 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
         let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
             self.isAdding = false
-            self.selectedIndex = editActionsForRowAt.row
+            self.selectedListIndex = editActionsForRowAt.row
             let cell = tableView.cellForRow(at: editActionsForRowAt)
             self.prevListName = (cell?.textLabel?.text)!
             self.displayPopUp()
@@ -165,6 +163,8 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 
                 // delete the row from display(screen)
                 self.deleteFromDisplay(at: editActionsForRowAt)
+                // save changes to data model
+                DataModel.sharedInstance.deleteData(deleteAt: editActionsForRowAt.row)
                 })
             // add and present alert
             deleteAlert.addAction(deleteAction)
@@ -179,24 +179,26 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // deselect the previous cell
-        let prevcell = tableView.cellForRow(at: [0, self.selectedListIndex])
-        prevcell!.backgroundColor = self.colors[self.selectedListIndex % 3]
-        displayList[selectedListIndex][0] = "0"
-        let prevIndex = selectedListIndex
+        if (self.selectedListIndex > -1) {
+            // deselect the previous cell
+            let prevcell = tableView.cellForRow(at: [0, self.selectedListIndex])
+            prevcell!.backgroundColor = self.colors[self.selectedListIndex % 3]
+            self.displayList[self.selectedListIndex][0] = "0"
+        }
+        let prevIndex = self.selectedListIndex
         
         // mark this list as selected
         self.selectedListIndex = indexPath.row
-        displayList[selectedListIndex][0] = "1"
+        self.displayList[self.selectedListIndex][0] = "1"
         // get the selected cell
         let cell = tableView.cellForRow(at: indexPath)
         cell!.backgroundColor = selectedCellColor
         
         // save changes to data model
-        DataModel.sharedInstance.updateHeader(prev: prevIndex, new: selectedListIndex, toName: nil)
+        DataModel.sharedInstance.updateHeader(prev: prevIndex, new: self.selectedListIndex, toName: nil)
         
-        // TODO: go to main view to display contents of the list
-
+        // go to main view to display contents of the list
+        self.tabBarController?.selectedIndex = 0
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -284,11 +286,11 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
         saveBtn.isEnabled = false
         self.mask.isHidden = false
         if isAdding {
-            popUpLabel.text = "Add a new list"
+            popUpLabel.text = "New List Name"
             textField.text = ""
             textField.placeholder = "..."
         } else {
-            popUpLabel.text = "Edit list name"
+            popUpLabel.text = "Edit List Name"
             textField.text = prevListName
         }
     }
@@ -298,7 +300,6 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
         textField.resignFirstResponder()
         isAdding = false
         hidePopUp()
-        selectedIndex = -1
         prevListName = ""
         newListName = ""
     }
