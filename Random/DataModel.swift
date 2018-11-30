@@ -29,12 +29,11 @@ class DataModel {
     }
     
     // TODO: change this
-    private var dataTemp: Array<Array<String>> = []
-//    [
-//    ["1", "Ave", "川宗", "富临轩", "西安味道", "唐朝", "center table", "uk"],
-//    ["0", "A", "a", "b", "c"],
-//    ["0", "B", "b", "c", "d"],
-//    ["0", "C", "c", "d", "e"]]
+    private var dataTemp: Array<Array<String>> = [
+    ["1", "Ave", "川宗", "富临轩", "西安味道", "唐朝", "center table", "uk"],
+    ["0", "A", "a", "b", "c"],
+    ["0", "B", "b", "c", "d"],
+    ["0", "C", "c", "d", "e"]]
     
     // Update data of one of the sublist
     public func updateData(to newData: Array<String>) {
@@ -120,5 +119,55 @@ class DataModel {
         // TODO: fetch data from local file
         
         self.data = dataTemp
+        
+        // TODO: try out json
+        if self.data != nil {
+            // convert data to JSON formatted array
+            var dataDict = [String: Any]()
+            for i in 0..<self.data!.count {
+                let sublist = self.data![i]
+                let entry = [
+                    "selected": sublist[0],
+                    "name": sublist[1],
+                    "items": Array(sublist.dropFirst(2))
+                    ] as [String : Any]
+                dataDict[String.init(describing: i)] = entry
+            }
+            let jsonFormatted = ["lists": dataDict]
+            
+            // create a JSON data
+            let jsonData = createJson(from: jsonFormatted)
+            
+            // parse the JSON data
+            if jsonData != nil {
+                let parsedData = parseJson(from: jsonData!)
+//                print(parsedData)
+            }
+        }
+    }
+    
+    // Create a JSON data out of the given JSON formatted array of dictionary,
+    // return the JSON data if succeed, otherwise return nil
+    public func createJson(from jsonFormatted: [String: Any]) -> Data? {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: jsonFormatted, options: JSONSerialization.WritingOptions.prettyPrinted)
+            return jsonData
+        } catch {
+            print("ERROR in JSON creating: \(error)")
+            return nil
+        }
+    }
+    
+    // Parse the JSON data into an array of dictionary,
+    // return the array if succeed, otherwise return nil
+    public func parseJson(from jsonData: Data) -> [String: Any]? {
+        do {
+            let data = try JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: Any]
+            return data
+        } catch {
+            print("ERROR in JSON parsing: \(error)")
+            return nil
+        }
+
     }
 }
