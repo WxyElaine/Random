@@ -61,6 +61,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.delegate = self
         tableView.dataSource = self
         self.tableView.register(ListTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.isScrollEnabled = true
         
         // pull to refresh
         if #available(iOS 10.0, *) {
@@ -113,9 +114,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     // For "Add" button
     @IBAction func addNewItem(_ sender: UIButton?) {
         prevCount = displayList.count
-        let cell : ListTableViewCell = addPlaceHolderCellWithoutRefresh()
-        // display keyboard
-        cell.label.becomeFirstResponder()
+        addPlaceHolderCellWithoutRefresh()
     }
     
     // For "Generate" button
@@ -173,11 +172,11 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if addPlaceHolder {
             // add a placeholder cell
             cell.label.text = ""
-            cell.label.placeholder = "Tap to enter an item"
             addPlaceHolder = false
         } else {
             cell.label.text = self.displayList[indexPath.row]
         }
+        cell.label.placeholder = "Tap to enter an item"
 
         return cell
     }
@@ -257,13 +256,30 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     // Add a place holder cell immediately, and returns the new cell
-    private func addPlaceHolderCellWithoutRefresh() -> ListTableViewCell {
+    private func addPlaceHolderCellWithoutRefresh() {
+        // add cell to table view
         displayList.append("")
-        let indexPath: IndexPath = [0, displayList.count - 1]
-        tableView.insertRows(at: [indexPath], with: .fade)
-        let cell : ListTableViewCell = tableView.cellForRow(at: indexPath) as! ListTableViewCell
-        cell.label.placeholder = "Tap to enter an item"
-        return cell
+        tableView.reloadData()
+        
+        // scroll to the newly-added cell
+        let indexPath = IndexPath(row: self.displayList.count - 1, section: 0)
+        self.tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
+        
+        // TODO: display keyboard
+        // TODO: TODO
+//        let cell = tableView.cellForRow(at: indexPath) as! ListTableViewCell
+//        cell.label.becomeFirstResponder()
+
+        
+    }
+    
+    // TODO: DELETE THIS
+    // Automatically scroll to the bottom of table view
+    private func scrollToBottom(){
+        DispatchQueue.main.async {
+            let indexPath = IndexPath(row: self.displayList.count - 1, section: 0)
+            self.tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
+        }
     }
     
     // Display an alert when "Generate" button is pressed but there is no item
@@ -293,7 +309,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.deleteRows(at: [indexPath], with: .fade)
         // add a placeholder cell if displayList is now empty
         if displayList.isEmpty {
-            let _ = addPlaceHolderCellWithoutRefresh()
+            addPlaceHolderCellWithoutRefresh()
         }
     }
     
@@ -318,5 +334,28 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     private func enableUserInteraction() {
         view.isUserInteractionEnabled = true
         view.alpha = CGFloat(1.0)
+    }
+    
+    
+    
+    
+    // TODO: MODIFY THIS
+    // TODO: automatically scroll to the editing text field
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        moveTextField(textfield: textField, moveDistance: -250, up: true)
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        moveTextField(textfield: textField, moveDistance: -250, up: false)
+    }
+
+    func moveTextField(textfield: UITextField, moveDistance: Int, up: Bool) {
+        let moveDuration = 0.3
+        let movement: CGFloat = CGFloat(up ? moveDistance: -moveDistance)
+        UIView.beginAnimations("animateTextField", context: nil)
+        UIView.setAnimationBeginsFromCurrentState(true)
+        UIView.setAnimationDuration(moveDuration)
+        self.tableView.frame = self.tableView.frame.offsetBy(dx: 0, dy: movement)
+        UIView.commitAnimations()
     }
 }

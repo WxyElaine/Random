@@ -108,10 +108,7 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
             // add a new entry to displayList
             let newSublist = ["0", newListName]
             displayList.append(newSublist)
-            let indexPath: IndexPath = [0, displayList.count - 1]
-            tableView.insertRows(at: [indexPath], with: .fade)
-            let cell : UITableViewCell = tableView.cellForRow(at: indexPath)!
-            cell.textLabel?.text = newListName
+            tableView.reloadData()
             
             // save changes to data model
             DataModel.sharedInstance.addData(add: newSublist)
