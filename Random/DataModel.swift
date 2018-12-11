@@ -30,13 +30,10 @@ class DataModel {
     
     // TODO: change this
     private var dataTemp: Array<Array<String>> = [
-    ["0", "Ave", "川宗", "富临轩", "西安味道", "唐朝", "uk"],
-    ["0", "今晚做什么", "学习", "不学习", "玩", "睡觉"],
+    ["0", "Ave", "University Kitchen", "Yummy Bites", "Taste of Xi'an", "The Burger Place", "uk"],
+    ["0", "What's next?", "Study", "Sleep", "Video games", "Eat"],
     ["1", "CSE", "311", "351", "391", "331", "332", "333", "341", "344", "440", "481", "451"],
-    ["0", "MATH", "381"],
-    ["0", "宝宝", "宝宝超可爱", "宝宝最可爱", "宝宝特别可爱"],
-    ["0", "心心", "心心最可爱", "心心特别可爱", "心心超可爱"],
-    ["0", "谁最可爱", "心心", "宝宝", "心心宝宝"]]
+    ["0", "MATH", "381"]]
     
     // Update data of one of the sublist
     public func updateData(to newData: Array<String>) {
